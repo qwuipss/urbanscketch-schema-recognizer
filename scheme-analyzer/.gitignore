@@ -1,0 +1,8 @@
+venv/
+env/
+models/*.pt
+models/runs/
+output_data.json
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
