@@ -1,8 +1,9 @@
 using iText.Kernel.Pdf.Canvas.Parser;
 using iText.Kernel.Pdf.Canvas.Parser.Data;
 using iText.Kernel.Pdf.Canvas.Parser.Listener;
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
-namespace Worker.Pdf;
+namespace SchemaRecognizer.Core.Pdf;
 
 public class VectorShape
 {
@@ -38,12 +39,12 @@ public class VectorShapeCollector : IEventListener
         // Stroke color
         var strokeColor = info.GetGraphicsState().GetStrokeColor();
         if (strokeColor != null)
-            shape.ColorStroke = strokeColor.ToString();
+            shape.ColorStroke = strokeColor.ToString()!;
 
         // Fill color
         var fillColor = info.GetGraphicsState().GetFillColor();
         if (fillColor != null)
-            shape.ColorFill = fillColor.ToString();
+            shape.ColorFill = fillColor.ToString()!;
 
         // // Points
         // foreach (var segment in path.GetPathSegments())
@@ -57,5 +58,5 @@ public class VectorShapeCollector : IEventListener
         Shapes.Add(shape);
     }
 
-    public ICollection<EventType> GetSupportedEvents() => null;
+    public ICollection<EventType> GetSupportedEvents() => null!;
 }

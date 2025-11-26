@@ -1,8 +1,8 @@
 ﻿using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas.Parser;
 using Microsoft.Extensions.DependencyInjection;
-using Worker.Pdf;
-using Worker.Setup;
+using SchemaRecognizer.Core.Pdf;
+using SchemaRecognizer.Core.Setup;
 
 var services = new ServiceCollection();
 

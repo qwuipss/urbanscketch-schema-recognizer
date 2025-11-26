@@ -1,4 +1,4 @@
-namespace Worker.Pdf;
+namespace SchemaRecognizer.Core.Pdf;
 
 internal enum PdfType
 {

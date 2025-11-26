@@ -3,9 +3,9 @@ using iText.Kernel.Pdf.Canvas.Parser;
 using iText.Kernel.Pdf.Canvas.Parser.Data;
 using iText.Kernel.Pdf.Canvas.Parser.Listener;
 
-namespace Worker.Pdf;
+namespace SchemaRecognizer.Core.Pdf;
 
-internal static class PdfTypeDetector
+public static class PdfTypeDetector
 {
     public enum PdfType
     {
@@ -58,7 +58,7 @@ internal static class PdfTypeDetector
 
         public ICollection<EventType> GetSupportedEvents()
         {
-            return null; // подписка на все события
+            return null!; // подписка на все события
         }
     }
 }
