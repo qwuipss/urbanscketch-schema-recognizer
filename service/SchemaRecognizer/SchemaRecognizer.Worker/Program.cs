@@ -8,7 +8,7 @@ var services = new ServiceCollection();
 
 services.SetupAppLogging();
 
-var path = Path.Join(Environment.CurrentDirectory, "../../../../", "pdf/1.pdf");
+var path = Path.Join(Environment.CurrentDirectory, "../../../../", "pdf/vector/v1.pdf");
 var x = PdfTypeDetector.Detect(path);
 
 var d = ExtractVectorGeometry(path);
