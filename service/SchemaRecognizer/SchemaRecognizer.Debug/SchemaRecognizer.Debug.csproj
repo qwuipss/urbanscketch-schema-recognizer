@@ -5,7 +5,12 @@
     </PropertyGroup>
     
     <ItemGroup>
-      <PackageReference Include="PdfPig" />
+      <PackageReference Include="itext7" />
+      <PackageReference Include="itext7.bouncy-castle-adapter" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\SchemaRecognizer.Core\SchemaRecognizer.Core.csproj" />
     </ItemGroup>
     
 </Project>

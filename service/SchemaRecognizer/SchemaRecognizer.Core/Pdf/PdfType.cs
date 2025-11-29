@@ -1,6 +1,6 @@
 namespace SchemaRecognizer.Core.Pdf;
 
-internal enum PdfType
+public enum PdfType
 {
     Vector,
     Raster
