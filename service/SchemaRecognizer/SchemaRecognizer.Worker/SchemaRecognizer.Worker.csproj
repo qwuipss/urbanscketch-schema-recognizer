@@ -5,7 +5,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="itext" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     </ItemGroup>
 

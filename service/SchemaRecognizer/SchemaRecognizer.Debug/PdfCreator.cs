@@ -6,6 +6,7 @@ using iText.Kernel.Pdf.Canvas;
 using iText.Layout;
 using iText.Layout.Element;
 using iText.Layout.Properties;
+using SchemaRecognizer.Core.Geometry;
 using UglyToad.PdfPig.Core;
 
 namespace SchemaRecognizer.Debug;
@@ -83,6 +84,26 @@ internal static class PdfCreator
             .EndText();
 
         document.Close();
+    }
+
+    public static void Create(string filePath, IEnumerable<Figure> figures)
+    {
+        using var writer = new PdfWriter(filePath);
+        using var pdf = new PdfDocument(writer);
+        // var document = new Document(pdf, PageSize.A4);
+        var document = new Document(pdf, new PageSize(1684, 1191));
+
+        document.Add(
+            new Paragraph("")
+                .SetFontSize(20)
+                .SetTextAlignment(TextAlignment.CENTER)
+        );
+        var canvas = new PdfCanvas(pdf.GetFirstPage());
+
+        foreach (var figure in figures)
+        {
+            figure.Draw(canvas);
+        }
     }
 
     public static void Create(string filePath, IEnumerable<PdfSubpath> subPaths)

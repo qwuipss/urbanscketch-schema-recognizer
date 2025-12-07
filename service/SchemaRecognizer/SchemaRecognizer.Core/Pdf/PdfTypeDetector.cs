@@ -9,7 +9,7 @@ public class PdfTypeDetector : IPdfTypeDetector
         using var doc = PdfDocument.Open(fileInfo.FullName);
         var page = doc.GetPages().Single();
 
-        var isVector = page.Text.Length is not 0 || page.Paths.Count is not 0;
+        var isVector = page.Paths.Count is not 0;
 
         return isVector ? PdfType.Vector : PdfType.Raster;
     }

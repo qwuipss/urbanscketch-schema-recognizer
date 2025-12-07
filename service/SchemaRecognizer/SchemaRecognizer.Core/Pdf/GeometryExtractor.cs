@@ -1,27 +1,29 @@
+using SchemaRecognizer.Core.Extensions;
+using SchemaRecognizer.Core.Geometry;
 using UglyToad.PdfPig;
-using UglyToad.PdfPig.Core;
 
 namespace SchemaRecognizer.Core.Pdf;
 
 public class GeometryExtractor : IGeometryExtractor
 {
-    public List<PdfSubpath> Extract(FileInfo fileInfo)
+    public ICollection<Figure> Extract(FileInfo fileInfo)
     {
         using var doc = PdfDocument.Open(fileInfo.FullName);
         var page = doc.GetPages().Single();
-        var l = new List<PdfSubpath>();
+        var figures = new List<Figure>();
 
         foreach (var path in page.Paths)
         {
             foreach (var subPath in path)
             {
-                if (subPath.IsClosed())
+                if (subPath.IsClosed() && subPath.HasClose() && !subPath.HasBezierCurve())
                 {
-                    l.Add(subPath);
+                    var polygon = new Polygon(subPath);
+                    figures.Add(polygon);
                 }
             }
         }
-        
-        return l;
+
+        return figures;
     }
 }

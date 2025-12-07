@@ -26,8 +26,8 @@ internal sealed partial class Executor(
         {
             throw new NotSupportedException(); // temp
         }
-        
-        new GeometryExtractor().Extract(fileInfo);
+
+        var d = new GeometryExtractor().Extract(fileInfo);
     }
 
     [LoggerMessage(LogLevel.Information, "Executor started")]
