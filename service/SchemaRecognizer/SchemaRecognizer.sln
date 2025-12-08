@@ -1,6 +1,10 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Worker", "Worker\Worker.csproj", "{8DF80220-CCF7-44B2-850D-A1B3248903E7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchemaRecognizer.Worker", "SchemaRecognizer.Worker\SchemaRecognizer.Worker.csproj", "{8DF80220-CCF7-44B2-850D-A1B3248903E7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchemaRecognizer.Debug", "SchemaRecognizer.Debug\SchemaRecognizer.Debug.csproj", "{D4561DF6-FEB9-4D19-A132-595AB4F3204F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchemaRecognizer.Core", "SchemaRecognizer.Core\SchemaRecognizer.Core.csproj", "{73CA1244-9D2B-4CDA-A7D4-869870C6F6E0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,5 +16,13 @@ Global
 		{8DF80220-CCF7-44B2-850D-A1B3248903E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8DF80220-CCF7-44B2-850D-A1B3248903E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8DF80220-CCF7-44B2-850D-A1B3248903E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4561DF6-FEB9-4D19-A132-595AB4F3204F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4561DF6-FEB9-4D19-A132-595AB4F3204F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4561DF6-FEB9-4D19-A132-595AB4F3204F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4561DF6-FEB9-4D19-A132-595AB4F3204F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73CA1244-9D2B-4CDA-A7D4-869870C6F6E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73CA1244-9D2B-4CDA-A7D4-869870C6F6E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73CA1244-9D2B-4CDA-A7D4-869870C6F6E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73CA1244-9D2B-4CDA-A7D4-869870C6F6E0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

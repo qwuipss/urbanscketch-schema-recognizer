@@ -2,9 +2,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
 
-namespace Worker.Setup;
+namespace SchemaRecognizer.Worker.Setup;
 
-internal static class SetupLogging
+public static class SetupLogging
 {
     public static IServiceCollection SetupAppLogging(this IServiceCollection services)
     {
