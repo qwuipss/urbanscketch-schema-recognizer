@@ -15,8 +15,9 @@ public sealed class Polygon(PdfSubpath subPath) : Figure
             return;
         }
 
-        canvas.SetFillColorRgb(0, 0, 1);
-        canvas.SetStrokeColorRgb(0, 1, 0);
+        canvas.SetLineWidth(1);
+        canvas.SetFillColorRgb(0, .25f, .5f);
+        canvas.SetStrokeColorRgb(0, .8f, .8f);
 
         canvas.MoveTo(_coordinates[0].X, _coordinates[0].Y);
 
@@ -25,16 +26,7 @@ public sealed class Polygon(PdfSubpath subPath) : Figure
             canvas.LineTo(coordinate.X, coordinate.Y);
         }
 
-        canvas.SetLineWidth(1);
-        // canvas.SetStrokeColorRgb(0, 1, 0);
-
-        // закрываем контур
         canvas.ClosePathFillStroke();
-        // canvas.ClosePath();
-
-        // canvas.Stroke();
-        // заливаем и обводим
-        // canvas.FillStroke();
     }
 
     private static List<Coordinate> GetCoordinates(PdfSubpath subPath)
