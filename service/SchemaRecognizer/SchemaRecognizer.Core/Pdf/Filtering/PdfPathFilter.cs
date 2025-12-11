@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using SchemaRecognizer.Core.Configuration;
+using SchemaRecognizer.Core.Extensions;
 using UglyToad.PdfPig.Graphics;
 
 namespace SchemaRecognizer.Core.Pdf.Filtering;
@@ -35,8 +36,9 @@ public sealed class PdfPathFilter(IOptions<PdfPathFilterOptions> options) : IPdf
             return PdfPathFilterVerdict.BoundingRectangleSmallHeight;
         }
 
-        // if (expr)
+        if (IsFillColorBlacklisted(path))
         {
+            return PdfPathFilterVerdict.ColorBlacklisted;
         }
 
         return PdfPathFilterVerdict.None;
@@ -51,14 +53,15 @@ public sealed class PdfPathFilter(IOptions<PdfPathFilterOptions> options) : IPdf
 
     private bool IsFillColorBlacklisted(PdfPath path)
     {
-        if (!path.IsFilled)
+        if (!path.IsFilled || path.FillColor is null)
         {
             return false;
         }
 
-        var (r, g, b) = path.FillColor!.ToRGBValues();
+        var color = path.FillColor.ToRGBValues().ToHexColorString();
         var blacklistedColors = _options.Value.ColorsBlacklist;
-        return false;
+
+        return blacklistedColors.Contains(color, StringComparer.OrdinalIgnoreCase);
     }
 
     private bool IsBoundingRectangleSmallArea(PdfPath path)
