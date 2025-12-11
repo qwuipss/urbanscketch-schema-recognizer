@@ -1,4 +1,4 @@
-namespace SchemaRecognizer.Core.Pdf;
+namespace SchemaRecognizer.Core.Pdf.Utilities;
 
 public interface IPdfValidator
 {

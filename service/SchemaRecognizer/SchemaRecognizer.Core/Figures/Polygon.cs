@@ -1,8 +1,7 @@
-using iText.Kernel.Colors;
 using iText.Kernel.Pdf.Canvas;
 using UglyToad.PdfPig.Core;
 
-namespace SchemaRecognizer.Core.Geometry;
+namespace SchemaRecognizer.Core.Figures;
 
 public sealed class Polygon(PdfSubpath subPath) : Figure
 {

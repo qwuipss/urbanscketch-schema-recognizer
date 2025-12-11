@@ -6,7 +6,7 @@ using iText.Kernel.Pdf.Canvas;
 using iText.Layout;
 using iText.Layout.Element;
 using iText.Layout.Properties;
-using SchemaRecognizer.Core.Geometry;
+using SchemaRecognizer.Core.Figures;
 using UglyToad.PdfPig.Core;
 
 namespace SchemaRecognizer.Debug;

@@ -1,6 +1,6 @@
 using iText.Kernel.Pdf.Canvas;
 
-namespace SchemaRecognizer.Core.Geometry;
+namespace SchemaRecognizer.Core.Figures;
 
 public abstract class Figure
 {

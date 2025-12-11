@@ -4,7 +4,7 @@ using Serilog;
 
 namespace SchemaRecognizer.Worker.Setup;
 
-public static class SetupLogging
+public static class LoggingSetup
 {
     public static IServiceCollection SetupAppLogging(this IServiceCollection services)
     {

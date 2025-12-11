@@ -1,6 +1,6 @@
 using UglyToad.PdfPig;
 
-namespace SchemaRecognizer.Core.Pdf;
+namespace SchemaRecognizer.Core.Pdf.Utilities;
 
 public class PdfTypeDetector : IPdfTypeDetector
 {

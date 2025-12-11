@@ -1,8 +1,8 @@
-using SchemaRecognizer.Core.Geometry;
+using SchemaRecognizer.Core.Figures;
 
 namespace SchemaRecognizer.Core.Pdf;
 
-public interface IGeometryExtractor
+public interface IPdfFiguresExtractor
 {
     ICollection<Figure> Extract(FileInfo fileInfo);
 }

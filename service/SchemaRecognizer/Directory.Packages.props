@@ -4,10 +4,15 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="itext" Version="9.4.0" />
+    <PackageVersion Include="itext.bouncy-castle-adapter" Version="9.4.0" />
     <PackageVersion Include="itext7" Version="9.4.0" />
     <PackageVersion Include="itext7.bouncy-castle-adapter" Version="9.4.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="10.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="10.0.1" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.Options.DataAnnotations" Version="10.0.1" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageVersion Include="PdfPig" Version="0.1.12" />
     <PackageVersion Include="Serilog" Version="4.3.0" />

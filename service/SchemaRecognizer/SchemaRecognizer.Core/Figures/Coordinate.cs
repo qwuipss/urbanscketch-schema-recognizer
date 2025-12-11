@@ -1,3 +1,3 @@
-namespace SchemaRecognizer.Core.Geometry;
+namespace SchemaRecognizer.Core.Figures;
 
 public sealed record Coordinate(double X, double Y);
