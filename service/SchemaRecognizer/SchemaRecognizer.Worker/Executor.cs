@@ -15,10 +15,10 @@ internal sealed partial class Executor(
 ) : IExecutor
 {
     private readonly ILogger<Executor> _logger = logger;
-    private readonly IPdfValidator _pdfValidator = pdfValidator;
-    private readonly IPdfTypeDetector _pdfTypeDetector = pdfTypeDetector;
-    private readonly IPdfFiguresExtractor _pdfFiguresExtractor = pdfFiguresExtractor;
     private readonly IPdfDrawer _pdfDrawer = pdfDrawer;
+    private readonly IPdfFiguresExtractor _pdfFiguresExtractor = pdfFiguresExtractor;
+    private readonly IPdfTypeDetector _pdfTypeDetector = pdfTypeDetector;
+    private readonly IPdfValidator _pdfValidator = pdfValidator;
 
     public void Run(FileInfo fileInfo)
     {

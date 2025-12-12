@@ -49,7 +49,7 @@ public sealed partial class PdfFiguresExtractor(ILogger<PdfFiguresExtractor> log
     private void LogFilterVerdictStatistics(Dictionary<PdfPathFilterVerdict, int> filterVerdictStatistics)
     {
         const int paddingWidth = 2;
-        
+
         var stringBuilder = new StringBuilder();
         var nameMaxWidth = filterVerdictStatistics.Keys.Max(filterVerdict => filterVerdict.ToString().Length) + paddingWidth;
         var valueMaxWidth = filterVerdictStatistics.Values.Max(count => count.ToString().Length) + paddingWidth;

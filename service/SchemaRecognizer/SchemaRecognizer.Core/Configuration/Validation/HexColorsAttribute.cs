@@ -18,13 +18,13 @@ public class HexColorsAttribute : ValidationAttribute
             {
                 return false;
             }
-            
+
             if (!IsHexColor(colorString))
             {
                 return false;
             }
         }
-        
+
         return true;
     }
 
@@ -44,5 +44,7 @@ public class HexColorsAttribute : ValidationAttribute
     }
 
     public override string FormatErrorMessage(string name)
-        => $"{name} is not valid hex colors list";
+    {
+        return $"{name} is not valid hex colors list";
+    }
 }

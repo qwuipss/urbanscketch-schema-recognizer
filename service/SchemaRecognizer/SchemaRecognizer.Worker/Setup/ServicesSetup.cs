@@ -11,11 +11,11 @@ internal static class ServicesSetup
     public static IServiceCollection SetupAppServices(this IServiceCollection services)
     {
         return services
-            .AddSingleton<IPdfTypeDetector, PdfTypeDetector>()
-            .AddSingleton<IPdfValidator, PdfValidator>()
-            .AddSingleton<IPdfPathFilter, PdfPathFilter>()
-            .AddSingleton<IPdfFiguresExtractor, PdfFiguresExtractor>()
-            .AddSingleton<IPdfDrawer, PdfDrawer>()
-            .AddSingleton<IExecutor, Executor>();
+               .AddSingleton<IPdfTypeDetector, PdfTypeDetector>()
+               .AddSingleton<IPdfValidator, PdfValidator>()
+               .AddSingleton<IPdfPathFilter, PdfPathFilter>()
+               .AddSingleton<IPdfFiguresExtractor, PdfFiguresExtractor>()
+               .AddSingleton<IPdfDrawer, PdfDrawer>()
+               .AddSingleton<IExecutor, Executor>();
     }
 }

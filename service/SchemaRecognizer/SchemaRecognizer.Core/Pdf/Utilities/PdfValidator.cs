@@ -15,12 +15,12 @@ public class PdfValidator : IPdfValidator
         {
             throw new NotSupportedException($"File {fileInfo.FullName} is not PDF");
         }
-        
+
         using var doc = PdfDocument.Open(fileInfo.FullName);
 
         if (doc.NumberOfPages is not 1)
         {
-            throw  new NotSupportedException($"File {fileInfo.FullName} has more than 1 page");
+            throw new NotSupportedException($"File {fileInfo.FullName} has more than 1 page");
         }
     }
 }
