@@ -6,5 +6,5 @@ namespace SchemaRecognizer.Core.Figures;
 public abstract class Figure
 {
     public abstract void Draw(PdfCanvas canvas);
-    public abstract IEnumerable<Coordinate> GetCoordinates(PdfFileInfo pdfFileInfo);
+    public abstract object ToGeoJsonFeature(PdfFileInfo pdfFileInfo);
 }

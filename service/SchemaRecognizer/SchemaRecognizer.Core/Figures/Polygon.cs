@@ -29,15 +29,35 @@ public sealed class Polygon(PdfSubpath subPath) : Figure
         canvas.ClosePathFillStroke();
     }
 
-    public override IEnumerable<Coordinate> GetCoordinates(PdfFileInfo pdfFileInfo)
+    public override object ToGeoJsonFeature(PdfFileInfo pdfFileInfo)
     {
+        var featureCoordinates = new List<double[]>();
         foreach (var coordinate in _coordinates)
         {
-            yield return new Coordinate(
+            var featureCoordinate = new[]
+            {
                 coordinate.X / Constants.PdfMmToPtFactor * pdfFileInfo.Scale / Constants.MillimetersInMeter,
                 (pdfFileInfo.Height - coordinate.Y) / Constants.PdfMmToPtFactor * pdfFileInfo.Scale / Constants.MillimetersInMeter
-            );
+            };
+
+            featureCoordinates.Add(featureCoordinate);
         }
+
+        var feature = new
+        {
+            type = "Feature",
+            geometry = new
+            {
+                type = "Polygon",
+                coordinates = new[] { featureCoordinates }
+            },
+            properties = new
+            {
+                kind = nameof(Polygon),
+            },
+        };
+        
+        return feature;
     }
 
     private static List<Coordinate> GetCoordinates(PdfSubpath subPath)

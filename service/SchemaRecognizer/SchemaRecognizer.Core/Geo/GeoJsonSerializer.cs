@@ -1,7 +1,6 @@
 using System.Text.Json;
 using Microsoft.Extensions.Options;
 using SchemaRecognizer.Core.Configuration;
-using SchemaRecognizer.Core.Extensions;
 using SchemaRecognizer.Core.Figures;
 using SchemaRecognizer.Core.Helpers;
 using SchemaRecognizer.Core.Pdf;
@@ -21,33 +20,7 @@ public sealed class GeoJsonSerializer(IOptions<PdfSchemaOptions> options) : IGeo
     public void Serialize(IEnumerable<Figure> figures, PdfFileInfo pdfFileInfo)
     {
         var fileInfo = FilesHelper.GetFileInfoByPath(_options.Value.WriteFiguresGeoJsonFilePath);
-        using var stream = fileInfo.Open(FileMode.CreateNew, FileAccess.Write);
-        var features = new List<object>();
-
-        foreach (var figure in figures)
-        {
-            var figureCoordinates = figure.GetCoordinates(pdfFileInfo);
-
-            var featureCoordinates = figureCoordinates
-                                     .Select(c => c.ToArray())
-                                     .ToList();
-
-            var feature = new
-            {
-                type = "Feature",
-                geometry = new
-                {
-                    type = "Polygon",
-                    coordinates = new[] { featureCoordinates }
-                },
-                properties = new
-                {
-                    kind = figure.GetType().Name,
-                },
-            };
-
-            features.Add(feature);
-        }
+        var features = figures.Select(figure => figure.ToGeoJsonFeature(pdfFileInfo)).ToList();
 
         var geoJsonObject = new
         {
@@ -55,6 +28,7 @@ public sealed class GeoJsonSerializer(IOptions<PdfSchemaOptions> options) : IGeo
             features,
         };
 
+        using var stream = fileInfo.Open(FileMode.CreateNew, FileAccess.Write);
         JsonSerializer.Serialize(
             stream,
             geoJsonObject,
