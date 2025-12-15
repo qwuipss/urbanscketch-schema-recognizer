@@ -1,6 +1,7 @@
 using iText.Kernel.Pdf.Canvas;
 using SchemaRecognizer.Core.Pdf;
 using UglyToad.PdfPig.Core;
+using static SchemaRecognizer.Core.Pdf.Constants;
 
 namespace SchemaRecognizer.Core.Figures;
 
@@ -32,18 +33,28 @@ public sealed class Polygon(PdfSubpath subPath) : Figure
     public override object ToGeoJsonFeature(PdfFileInfo pdfFileInfo)
     {
         var featureCoordinates = new List<double[]>();
+
         foreach (var coordinate in _coordinates)
         {
-            var featureCoordinate = new[]
-            {
-                coordinate.X / Constants.PdfMmToPtFactor * pdfFileInfo.Scale / Constants.MillimetersInMeter,
-                (pdfFileInfo.Height - coordinate.Y) / Constants.PdfMmToPtFactor * pdfFileInfo.Scale / Constants.MillimetersInMeter
-            };
+            var xMeters =
+                coordinate.X
+                / PdfMmToPtFactor
+                * pdfFileInfo.Scale
+                / MillimetersInMeter;
 
-            featureCoordinates.Add(featureCoordinate);
+            var yMeters =
+                (pdfFileInfo.Height - coordinate.Y)
+                / PdfMmToPtFactor
+                * pdfFileInfo.Scale
+                / MillimetersInMeter;
+
+            var longitude = xMeters / EarthRadius * RadiansToDegreesFactor;
+            var latitude = yMeters / EarthRadius * RadiansToDegreesFactor;
+
+            featureCoordinates.Add([longitude, latitude,]);
         }
 
-        var feature = new
+        return new
         {
             type = "Feature",
             geometry = new
@@ -53,11 +64,9 @@ public sealed class Polygon(PdfSubpath subPath) : Figure
             },
             properties = new
             {
-                kind = nameof(Polygon),
-            },
+                kind = nameof(Polygon)
+            }
         };
-        
-        return feature;
     }
 
     private static List<Coordinate> GetCoordinates(PdfSubpath subPath)
