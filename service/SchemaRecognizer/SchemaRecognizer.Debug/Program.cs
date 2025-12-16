@@ -1,8 +1,12 @@
-﻿using Path = System.IO.Path;
+﻿using IronSoftware.Drawing;
 
-var filePathToWrite = Path.Join(Environment.CurrentDirectory, "../../../../", "pdf/dev/v2-geom.pdf");
-var filePathToRead = Path.Join(Environment.CurrentDirectory, "../../../../", "pdf/vector/v2.pdf");
-// PdfCreator.Create(filePathToWrite, new PdfFiguresExtractor().Extract(new FileInfo(filePathToRead)));
+var pdf = PdfDocument.FromFile("Example.pdf");
 
-// var filePathToRead = Path.Join(Environment.CurrentDirectory, "../../../../", "pdf/vector/v3.pdf");
-// PdfReader.Read(filePathToRead);
+// Extract all pages to a folder as image files
+pdf.RasterizeToImageFiles(Path.Join(Environment.CurrentDirectory, "../../../../", "pdf/dev/v2-geom.pdf"));
+
+// Dimensions and page ranges may be specified
+pdf.RasterizeToImageFiles(@"C:\image\folder\example_pdf_image_*.jpg", 100, 80);
+
+// Extract all pages as AnyBitmap objects
+AnyBitmap[] pdfBitmaps = pdf.ToBitmap();

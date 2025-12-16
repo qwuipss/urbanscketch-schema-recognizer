@@ -3,10 +3,10 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
+    <PackageVersion Include="IronPdf" Version="2025.11.12" />
+    <PackageVersion Include="IronPdf.Native.Chrome.Linux" Version="2025.11.8" />
     <PackageVersion Include="itext" Version="9.4.0" />
     <PackageVersion Include="itext.bouncy-castle-adapter" Version="9.4.0" />
-    <PackageVersion Include="itext7" Version="9.4.0" />
-    <PackageVersion Include="itext7.bouncy-castle-adapter" Version="9.4.0" />
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="10.0.1" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="10.0.1" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
