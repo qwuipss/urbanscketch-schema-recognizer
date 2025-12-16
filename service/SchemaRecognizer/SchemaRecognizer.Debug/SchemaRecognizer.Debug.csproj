@@ -7,10 +7,6 @@
     <ItemGroup>
         <PackageReference Include="IronPdf" />
         <PackageReference Include="IronPdf.Native.Chrome.Linux" />
-        <PackageReference Include="itext"/>
-        <PackageReference Include="itext.bouncy-castle-adapter"/>
-        <PackageReference Include="SkiaSharp" />
-        <PackageReference Include="SkiaSharp.NativeAssets.Linux" />
     </ItemGroup>
 
     <ItemGroup>
