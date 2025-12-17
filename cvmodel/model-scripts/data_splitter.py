@@ -1,32 +1,33 @@
 import json
-import os
-import shutil
 import random
+import shutil
+from pathlib import Path
 from PIL import Image
 
-COCO_JSON = "result_coco.json"
-RAW_IMAGES = "raw_images"
-OUT = "dataset"
-SPLIT = 0.8                 # 80% train / 20% val
-CLASS_ID = 0                # contour
+ROOT = Path(__file__).resolve().parents[1]
+
+COCO_JSON = ROOT / "dataset/coco/result_coco.json"
+IMAGES_DIR = ROOT / "dataset/raw-images"
+OUTPUT_DIR = ROOT / "dataset/yolo"
+
+TRAIN_RATIO = 0.8
+CLASS_ID = 0  # contour
 
 random.seed(42)
 
 for p in [
-    f"{OUT}/images/train",
-    f"{OUT}/images/val",
-    f"{OUT}/labels/train",
-    f"{OUT}/labels/val",
+    OUTPUT_DIR / "images/train",
+    OUTPUT_DIR / "images/val",
+    OUTPUT_DIR / "labels/train",
+    OUTPUT_DIR / "labels/val",
 ]:
-    os.makedirs(p, exist_ok=True)
+    p.mkdir(parents=True, exist_ok=True)
 
 with open(COCO_JSON, "r", encoding="utf-8") as f:
     coco = json.load(f)
 
-# image_id → info
 images = {img["id"]: img for img in coco["images"]}
 
-# image_id → list of polygons
 ann_by_img = {}
 for ann in coco["annotations"]:
     ann_by_img.setdefault(ann["image_id"], []).append(ann)
@@ -34,7 +35,7 @@ for ann in coco["annotations"]:
 img_ids = list(images.keys())
 random.shuffle(img_ids)
 
-split_idx = int(len(img_ids) * SPLIT)
+split_idx = int(len(img_ids) * TRAIN_RATIO)
 train_ids = set(img_ids[:split_idx])
 val_ids = set(img_ids[split_idx:])
 
@@ -42,15 +43,17 @@ def process(img_id, subset):
     img = images[img_id]
     name = img["file_name"]
 
-    src_img = os.path.join(RAW_IMAGES, name)
-    dst_img = os.path.join(OUT, "images", subset, name)
+    src_img = IMAGES_DIR / name
+    dst_img = OUTPUT_DIR / "images" / subset / name
+
+    if not src_img.exists():
+        print(f"[WARN] Image not found: {src_img}")
+        return
 
     shutil.copy(src_img, dst_img)
 
     w, h = Image.open(src_img).size
-    label_path = os.path.join(
-        OUT, "labels", subset, os.path.splitext(name)[0] + ".txt"
-    )
+    label_path = OUTPUT_DIR / "labels" / subset / f"{src_img.stem}.txt"
 
     for ann in ann_by_img.get(img_id, []):
         for seg in ann["segmentation"]:
@@ -67,9 +70,9 @@ for img_id in train_ids:
 for img_id in val_ids:
     process(img_id, "val")
 
-with open(f"{OUT}/data.yaml", "w", encoding="utf-8") as f:
+with open(OUTPUT_DIR / "data.yaml", "w", encoding="utf-8") as f:
     f.write(
-        "path: dataset\n"
+        "path: dataset/yolo\n"
         "train: images/train\n"
         "val: images/val\n\n"
         "names:\n"
