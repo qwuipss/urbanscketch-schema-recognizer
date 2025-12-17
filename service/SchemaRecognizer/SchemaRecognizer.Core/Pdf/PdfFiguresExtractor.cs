@@ -13,10 +13,10 @@ public sealed partial class PdfFiguresExtractor(ILogger<PdfFiguresExtractor> log
     private readonly ILogger<PdfFiguresExtractor> _logger = logger;
     private readonly IPdfPathFilter _pdfPathFilter = pdfPathFilter;
 
-    public ICollection<Figure> Extract(FileInfo fileInfo)
+    public ICollection<Figure> Extract(PdfFileInfo pdfFileInfo)
     {
-        using var doc = PdfDocument.Open(fileInfo.FullName);
-        var page = doc.GetPages().Single();
+        using var document = PdfDocument.Open(pdfFileInfo.FileInfo.FullName);
+        var page = document.GetPages().Single();
         var filterVerdictStatistics = GetFilterVerdictStatistics();
         var figures = new List<Figure>();
 

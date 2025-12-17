@@ -4,8 +4,6 @@ namespace SchemaRecognizer.Core.Configuration;
 
 public sealed class PdfPathFilterOptions
 {
-    public string DrawFiguresFilePath { get; init; } = "./../../../../pdf/dev/figures.pdf";
-
     public int CommandsCountLimit { get; init; } = 20;
 
     public int SmallAreaThreshold { get; init; } = 100;

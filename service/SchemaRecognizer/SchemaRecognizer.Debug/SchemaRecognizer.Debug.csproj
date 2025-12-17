@@ -5,8 +5,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="itext7"/>
-        <PackageReference Include="itext7.bouncy-castle-adapter"/>
+        <PackageReference Include="IronPdf" />
+        <PackageReference Include="IronPdf.Native.Chrome.Linux" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using SchemaRecognizer.Core.Geo;
 using SchemaRecognizer.Core.Pdf;
 using SchemaRecognizer.Core.Pdf.Drawing;
 using SchemaRecognizer.Core.Pdf.Filtering;
@@ -16,6 +17,7 @@ internal static class ServicesSetup
                .AddSingleton<IPdfPathFilter, PdfPathFilter>()
                .AddSingleton<IPdfFiguresExtractor, PdfFiguresExtractor>()
                .AddSingleton<IPdfDrawer, PdfDrawer>()
+               .AddSingleton<IGeoJsonSerializer, GeoJsonSerializer>()
                .AddSingleton<IExecutor, Executor>();
     }
 }

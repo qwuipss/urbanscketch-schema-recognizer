@@ -1,8 +1,9 @@
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
+using SchemaRecognizer.Core.Geo;
 using SchemaRecognizer.Core.Pdf;
 using SchemaRecognizer.Core.Pdf.Drawing;
 using SchemaRecognizer.Core.Pdf.Utilities;
-using UglyToad.PdfPig;
 
 namespace SchemaRecognizer.Worker;
 
@@ -11,7 +12,8 @@ internal sealed partial class Executor(
     IPdfValidator pdfValidator,
     IPdfTypeDetector pdfTypeDetector,
     IPdfFiguresExtractor pdfFiguresExtractor,
-    IPdfDrawer pdfDrawer
+    IPdfDrawer pdfDrawer,
+    IGeoJsonSerializer geoJsonSerializer
 ) : IExecutor
 {
     private readonly ILogger<Executor> _logger = logger;
@@ -19,11 +21,13 @@ internal sealed partial class Executor(
     private readonly IPdfFiguresExtractor _pdfFiguresExtractor = pdfFiguresExtractor;
     private readonly IPdfTypeDetector _pdfTypeDetector = pdfTypeDetector;
     private readonly IPdfValidator _pdfValidator = pdfValidator;
+    private readonly IGeoJsonSerializer _geoJsonSerializer = geoJsonSerializer;
 
     public void Run(FileInfo fileInfo)
     {
         LogWorkerStarted();
-        _pdfValidator.Validate(fileInfo);
+
+        var pdfFileInfo = _pdfValidator.Validate(fileInfo);
         LogPdfValidated();
 
         var pdfType = _pdfTypeDetector.Detect(fileInfo);
@@ -34,18 +38,14 @@ internal sealed partial class Executor(
             throw new NotSupportedException(); // temp
         }
 
-        var figures = _pdfFiguresExtractor.Extract(fileInfo);
-        var pageSize = GetPageSize(fileInfo);
+        var figures = _pdfFiguresExtractor.Extract(pdfFileInfo);
+        LogFiguresExtractingFinished(figures.Count);
 
-        _pdfDrawer.Draw(figures, pageSize);
-    }
+        _pdfDrawer.Draw(figures, pdfFileInfo);
+        LogFiguresDrawingFinished();
 
-    private static (double Width, double Height) GetPageSize(FileInfo fileInfo)
-    {
-        using var doc = PdfDocument.Open(fileInfo.FullName);
-        var page = doc.GetPages().Single();
-
-        return (page.Width, page.Height);
+        _geoJsonSerializer.Serialize(figures, pdfFileInfo);
+        LogFiguresSerializingFinished();
     }
 
     [LoggerMessage(LogLevel.Information, "Executor started")]
@@ -54,6 +54,15 @@ internal sealed partial class Executor(
     [LoggerMessage(LogLevel.Information, "Pdf validated")]
     partial void LogPdfValidated();
 
-    [LoggerMessage(LogLevel.Information, "Detected pdf type: {pdfType}")]
+    [LoggerMessage(LogLevel.Information, "Detected pdf type: {PdfType}")]
     partial void LogDetectedPdfType(PdfType pdfType);
+
+    [LoggerMessage(LogLevel.Information, "Figures extracting finished. Extracted figures: {ExtractedFiguresCount}")]
+    partial void LogFiguresExtractingFinished(int extractedFiguresCount);
+
+    [LoggerMessage(LogLevel.Information, "Figures drawing finished")]
+    partial void LogFiguresDrawingFinished();
+
+    [LoggerMessage(LogLevel.Information, "Figures serializing finished")]
+    partial void LogFiguresSerializingFinished();
 }

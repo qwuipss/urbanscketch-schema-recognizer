@@ -1,5 +1,7 @@
 using iText.Kernel.Pdf.Canvas;
+using SchemaRecognizer.Core.Pdf;
 using UglyToad.PdfPig.Core;
+using static SchemaRecognizer.Core.Pdf.Constants;
 
 namespace SchemaRecognizer.Core.Figures;
 
@@ -28,10 +30,50 @@ public sealed class Polygon(PdfSubpath subPath) : Figure
         canvas.ClosePathFillStroke();
     }
 
+    public override object ToGeoJsonFeature(PdfFileInfo pdfFileInfo)
+    {
+        var featureCoordinates = new List<double[]>();
+
+        foreach (var coordinate in _coordinates)
+        {
+            var xMeters =
+                coordinate.X
+                / PdfMmToPtFactor
+                * pdfFileInfo.Scale
+                / MillimetersInMeter;
+
+            var yMeters =
+                (pdfFileInfo.Height - coordinate.Y)
+                / PdfMmToPtFactor
+                * pdfFileInfo.Scale
+                / MillimetersInMeter;
+
+            var longitude = xMeters / EarthRadius * RadiansToDegreesFactor;
+            var latitude = yMeters / EarthRadius * RadiansToDegreesFactor;
+
+            featureCoordinates.Add([longitude, latitude,]);
+        }
+
+        return new
+        {
+            type = "Feature",
+            geometry = new
+            {
+                type = "Polygon",
+                coordinates = new[] { featureCoordinates }
+            },
+            properties = new
+            {
+                kind = nameof(Polygon)
+            }
+        };
+    }
+
     private static List<Coordinate> GetCoordinates(PdfSubpath subPath)
     {
-        var isClosed = false;
-        var isMoved = false;
+        var hasClose = false;
+        var hasLine = false;
+        var hasMove = false;
         var coordinates = new List<Coordinate>(subPath.Commands.Count);
 
         foreach (var command in subPath.Commands)
@@ -39,28 +81,34 @@ public sealed class Polygon(PdfSubpath subPath) : Figure
             switch (command)
             {
                 case PdfSubpath.Move moveCommand:
-                    isMoved = true;
+                    hasMove = true;
                     coordinates.Add(new Coordinate(moveCommand.Location.X, moveCommand.Location.Y));
                     break;
                 case PdfSubpath.Line lineCommand:
+                    hasLine = true;
                     coordinates.Add(new Coordinate(lineCommand.To.X, lineCommand.To.Y));
                     break;
                 case PdfSubpath.Close:
-                    isClosed = true;
+                    hasClose = true;
                     break;
                 default:
                     throw new ArgumentException($"Command {command.GetType()} is not supported by {nameof(Polygon)}");
             }
         }
 
-        if (!isMoved)
+        if (!hasMove)
         {
-            throw new ArgumentException($"{nameof(PdfSubpath)} for {nameof(Polygon)} is not moved");
+            throw new ArgumentException($"{nameof(PdfSubpath)} for {nameof(Polygon)} has no {nameof(PdfSubpath.Move)}");
         }
 
-        if (!isClosed)
+        if (!hasLine)
         {
-            throw new ArgumentException($"{nameof(PdfSubpath)} for {nameof(Polygon)} is not closed");
+            throw new ArgumentException($"{nameof(PdfSubpath)} for {nameof(Polygon)} has no {nameof(PdfSubpath.Line)}");
+        }
+
+        if (!hasClose)
+        {
+            throw new ArgumentException($"{nameof(PdfSubpath)} for {nameof(Polygon)} has no  {nameof(PdfSubpath.Close)}");
         }
 
         return coordinates;

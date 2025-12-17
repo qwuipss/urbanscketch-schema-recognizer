@@ -4,44 +4,30 @@ using iText.Kernel.Pdf.Canvas;
 using Microsoft.Extensions.Options;
 using SchemaRecognizer.Core.Configuration;
 using SchemaRecognizer.Core.Figures;
+using SchemaRecognizer.Core.Helpers;
 using Path = System.IO.Path;
 
 namespace SchemaRecognizer.Core.Pdf.Drawing;
 
-public sealed class PdfDrawer(IOptions<PdfPathFilterOptions> options) : IPdfDrawer
+public sealed class PdfDrawer(IOptions<PdfPathFilterOptions> filterOptions, IOptions<PdfSchemaOptions> schemaOptions) : IPdfDrawer
 {
-    private readonly IOptions<PdfPathFilterOptions> _options = options;
+    private readonly IOptions<PdfPathFilterOptions> _filterOptions = filterOptions;
+    private readonly IOptions<PdfSchemaOptions> _schemaOptions = schemaOptions;
 
-    public void Draw(ICollection<Figure> figures, (double Width, double Height) pageSize)
+    public void Draw(ICollection<Figure> figures, PdfFileInfo pdfFileInfo)
     {
-        var fileInfo = GetDrawFiguresFileInfo();
+        var fileInfo = FilesHelper.GetFileInfoByPath(_schemaOptions.Value.DrawFiguresFilePath);
         var stream = fileInfo.Open(FileMode.CreateNew, FileAccess.Write);
 
         using var writer = new PdfWriter(stream);
         using var document = new PdfDocument(writer);
 
-        var page = document.AddNewPage(new PageSize((float)pageSize.Width, (float)pageSize.Height));
+        var page = document.AddNewPage(new PageSize((float)pdfFileInfo.Width, (float)pdfFileInfo.Height));
         var canvas = new PdfCanvas(page);
 
         foreach (var figure in figures)
         {
             figure.Draw(canvas);
         }
-    }
-
-    private FileInfo GetDrawFiguresFileInfo()
-    {
-        var drawFiguresFilePath = _options.Value.DrawFiguresFilePath;
-
-        var fileInfo = Path.IsPathRooted(drawFiguresFilePath)
-            ? new FileInfo(drawFiguresFilePath)
-            : new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, drawFiguresFilePath));
-
-        if (fileInfo.Exists)
-        {
-            fileInfo.Delete();
-        }
-
-        return fileInfo;
     }
 }

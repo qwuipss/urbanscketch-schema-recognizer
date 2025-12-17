@@ -5,9 +5,9 @@ using SchemaRecognizer.Worker.Setup;
 var services = new ServiceCollection();
 
 services
-    .SetupAppServices()
     .SetupAppConfiguration()
-    .SetupAppLogging();
+    .SetupAppLogging()
+    .SetupAppServices();
 
 var serviceProvider = services.BuildServiceProvider();
 
