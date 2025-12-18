@@ -1,6 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <ItemGroup>
+        <PackageReference Include="IronPdf" />
+        <PackageReference Include="IronPdf.Native.Chrome.Linux" />
         <PackageReference Include="itext"/>
         <PackageReference Include="itext.bouncy-castle-adapter"/>
         <PackageReference Include="Newtonsoft.Json"/>
@@ -9,6 +11,8 @@
         <PackageReference Include="Serilog.Extensions.Logging"/>
         <PackageReference Include="Serilog.Sinks.Console"/>
         <PackageReference Include="Microsoft.Extensions.Logging"/>
+        <PackageReference Include="SkiaSharp" />
+        <PackageReference Include="SkiaSharp.NativeAssets.Linux" />
     </ItemGroup>
 
 </Project>

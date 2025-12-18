@@ -30,7 +30,7 @@ public sealed class Polygon(PdfSubpath subPath) : Figure
         canvas.ClosePathFillStroke();
     }
 
-    public override object ToGeoJsonFeature(PdfFileInfo pdfFileInfo)
+    public override object GetGeoJsonFeature(PdfFileInfo pdfFileInfo)
     {
         var featureCoordinates = new List<double[]>();
 
@@ -48,8 +48,8 @@ public sealed class Polygon(PdfSubpath subPath) : Figure
                 * pdfFileInfo.Scale
                 / MillimetersInMeter;
 
-            var longitude = xMeters / EarthRadius * RadiansToDegreesFactor;
-            var latitude = yMeters / EarthRadius * RadiansToDegreesFactor;
+            var longitude = xMeters / EarthRadiusMeters * RadiansToDegreesFactor;
+            var latitude = yMeters / EarthRadiusMeters * RadiansToDegreesFactor;
 
             featureCoordinates.Add([longitude, latitude,]);
         }

@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="SchemaRecognizer.Core/SchemaRecognizer.Core.csproj" />
+  <Project Path="SchemaRecognizer.Debug/SchemaRecognizer.Debug.csproj" />
+  <Project Path="SchemaRecognizer.Worker/SchemaRecognizer.Worker.csproj" />
+</Solution>

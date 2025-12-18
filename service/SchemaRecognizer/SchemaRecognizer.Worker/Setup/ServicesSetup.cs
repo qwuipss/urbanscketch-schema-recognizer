@@ -3,6 +3,7 @@ using SchemaRecognizer.Core.Geo;
 using SchemaRecognizer.Core.Pdf;
 using SchemaRecognizer.Core.Pdf.Drawing;
 using SchemaRecognizer.Core.Pdf.Filtering;
+using SchemaRecognizer.Core.Pdf.Rasterization;
 using SchemaRecognizer.Core.Pdf.Utilities;
 
 namespace SchemaRecognizer.Worker.Setup;
@@ -18,6 +19,7 @@ internal static class ServicesSetup
                .AddSingleton<IPdfFiguresExtractor, PdfFiguresExtractor>()
                .AddSingleton<IPdfDrawer, PdfDrawer>()
                .AddSingleton<IGeoJsonSerializer, GeoJsonSerializer>()
+               .AddSingleton<IPdfRasterizer, PdfRasterizer>()
                .AddSingleton<IExecutor, Executor>();
     }
 }

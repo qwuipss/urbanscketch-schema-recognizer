@@ -4,6 +4,7 @@ using SchemaRecognizer.Core.Extensions;
 using SchemaRecognizer.Core.Figures;
 using SchemaRecognizer.Core.Pdf.Filtering;
 using UglyToad.PdfPig;
+using PdfDocument = UglyToad.PdfPig.PdfDocument;
 
 namespace SchemaRecognizer.Core.Pdf;
 
@@ -28,6 +29,12 @@ public sealed partial class PdfFiguresExtractor(ILogger<PdfFiguresExtractor> log
 
             if (filterVerdict is not PdfPathFilterVerdict.None)
             {
+                continue;
+            }
+
+            if (path.IsStroked && path.StrokeColor is not null && path.StrokeColor.ToRGBValues().r > 200)
+            {
+                Console.WriteLine("");
                 continue;
             }
 
