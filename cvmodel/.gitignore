@@ -1,4 +1,5 @@
 venv/
+dataset/
 env/
 models/*.pt
 models/runs/
