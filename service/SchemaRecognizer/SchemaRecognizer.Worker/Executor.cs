@@ -40,6 +40,9 @@ internal sealed partial class Executor(
             throw new NotSupportedException(); // temp
         }
 
+        _pdfRasterizer.Rasterize(pdfFileInfo);
+        LogPdfRasterizationFinished();
+
         var figures = _pdfFiguresExtractor.Extract(pdfFileInfo);
         LogFiguresExtractingFinished(figures.Count);
 
@@ -48,9 +51,6 @@ internal sealed partial class Executor(
 
         _geoJsonSerializer.Serialize(figures, pdfFileInfo);
         LogFiguresSerializingFinished();
-
-        _pdfRasterizer.Rasterize(pdfFileInfo);
-        LogPdfRasterizationFinished();
 
         _pdfValidator.ValidatePdfRasterization(pdfFileInfo);
         LogPdfRasterizationValidated();
@@ -76,7 +76,7 @@ internal sealed partial class Executor(
 
     [LoggerMessage(LogLevel.Information, "Pdf rasterization finished")]
     partial void LogPdfRasterizationFinished();
-    
+
     [LoggerMessage(LogLevel.Information, "Pdf rasterization validated")]
     partial void LogPdfRasterizationValidated();
 }

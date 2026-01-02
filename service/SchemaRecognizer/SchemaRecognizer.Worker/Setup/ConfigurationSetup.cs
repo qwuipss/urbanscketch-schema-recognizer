@@ -27,5 +27,10 @@ internal static class ConfigurationSetup
             .AddOptionsWithValidateOnStart<PdfPathFilterOptions>()
             .ValidateDataAnnotations()
             .Bind(configuration);
+        
+        services
+            .AddOptionsWithValidateOnStart<PdfSchemaOptions>()
+            .ValidateDataAnnotations()
+            .Bind(configuration);
     }
 }
