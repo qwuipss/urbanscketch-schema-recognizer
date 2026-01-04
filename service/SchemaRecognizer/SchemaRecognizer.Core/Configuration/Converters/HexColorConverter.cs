@@ -1,7 +1,8 @@
 using System.ComponentModel;
 using System.Globalization;
+using SchemaRecognizer.Core.Models;
 
-namespace SchemaRecognizer.Core.Configuration;
+namespace SchemaRecognizer.Core.Configuration.Converters;
 
 public sealed class HexColorConverter : TypeConverter
 {
@@ -20,7 +21,7 @@ public sealed class HexColorConverter : TypeConverter
 
         if (color?.Length is not 6
             || !color.All(c => c is >= '0' and <= '9' or >= 'a' and <= 'f' or >= 'A' and <= 'F'))
-            throw new FormatException($"'{nameof(value)} is not valid hex color");
+        {       throw new FormatException("Specified color is not valid hex color");}
 
         var r = Convert.ToByte(color[..2], hexBase);
         var g = Convert.ToByte(color[2..4], hexBase);

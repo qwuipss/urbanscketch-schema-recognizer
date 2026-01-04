@@ -1,3 +1,6 @@
+using SchemaRecognizer.Core.Models;
+using UglyToad.PdfPig.Core;
+
 namespace SchemaRecognizer.Core.Configuration;
 
 public sealed class PdfPathFilterOptions
@@ -9,6 +12,8 @@ public sealed class PdfPathFilterOptions
     public int SmallWidthThreshold { get; set; } = 10;
 
     public int SmallHeightThreshold { get; set; } = 10;
+
+    public PdfRectangle? BoundingBox { get; set; }
 
     public List<Color> ColorsBlacklist { get; set; } = [];
 }

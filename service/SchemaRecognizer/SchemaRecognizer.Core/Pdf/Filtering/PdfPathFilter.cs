@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Options;
 using SchemaRecognizer.Core.Configuration;
-using SkiaSharp;
+using UglyToad.PdfPig.Core;
+using UglyToad.PdfPig.Geometry;
 using UglyToad.PdfPig.Graphics;
 
 namespace SchemaRecognizer.Core.Pdf.Filtering;
@@ -9,7 +10,7 @@ public sealed class PdfPathFilter(IOptions<PdfPathFilterOptions> options) : IPdf
 {
     private readonly IOptions<PdfPathFilterOptions> _options = options;
 
-    public PdfPathFilterVerdict GetFilterVerdict(PdfPath path, SKBitmap bitmap)
+    public PdfPathFilterVerdict GetFilterVerdict(PdfPath path)
     {
         if (IsCommandsLimitExceeded(path))
         {
@@ -19,6 +20,11 @@ public sealed class PdfPathFilter(IOptions<PdfPathFilterOptions> options) : IPdf
         if (!IsBoundingRectanglePresent(path))
         {
             return PdfPathFilterVerdict.BoundingRectangleNotPresented;
+        }
+
+        if (!IsInBoundingBox(path))
+        {
+            return PdfPathFilterVerdict.OutOfBoundingBox;
         }
 
         if (IsBoundingRectangleSmallArea(path))
@@ -36,7 +42,7 @@ public sealed class PdfPathFilter(IOptions<PdfPathFilterOptions> options) : IPdf
             return PdfPathFilterVerdict.BoundingRectangleSmallHeight;
         }
 
-        if (IsFillColorBlacklisted(path, bitmap))
+        if (IsFillColorBlacklisted(path))
         {
             return PdfPathFilterVerdict.ColorBlacklisted;
         }
@@ -51,73 +57,31 @@ public sealed class PdfPathFilter(IOptions<PdfPathFilterOptions> options) : IPdf
         return boundingRectangle.HasValue;
     }
 
-    private bool IsFillColorBlacklisted(PdfPath path, SKBitmap bitmap)
+    private bool IsInBoundingBox(PdfPath path)
     {
-        // if (!path.IsFilled)
-        // {
-        //     return false;
-        // }
+        var filterOptions = _options.Value;
+
+        if (filterOptions.BoundingBox is null)
+        {
+            return true;
+        }
 
         var boundingRectangle = path.GetBoundingRectangle();
 
-        if (boundingRectangle is null)
+        
+        return boundingRectangle is null || filterOptions.BoundingBox.Value.IntersectsWith(boundingRectangle.Value);
+    }
+
+    private bool IsFillColorBlacklisted(PdfPath path)
+    {
+        if (!path.IsFilled || path.FillColor is null)
         {
             return false;
         }
 
-        var x0 = Math.Clamp((int)Math.Floor(boundingRectangle.Value.Left), 0, bitmap.Width - 1);
-        var x1 = Math.Clamp((int)Math.Ceiling(boundingRectangle.Value.Right), 0, bitmap.Width);
-        var y1 = Math.Clamp((int)Math.Floor(boundingRectangle.Value.Top), 0, bitmap.Height - 1);
-        var y0 = Math.Clamp((int)Math.Ceiling(boundingRectangle.Value.Bottom), 0, bitmap.Height);
+        var color = path.FillColor.ToRGBValues();
 
-        if (x1 <= x0 || y1 <= y0)
-        {
-            return false;
-        }
-
-        long sumR = 0, sumG = 0, sumB = 0;
-        long count = 0;
-
-        unsafe
-        {
-            var pixels = (SKColor*)bitmap.GetPixels();
-
-            for (var y = y0; y < y1; y++)
-            {
-                var row = y * bitmap.Width;
-                for (var x = x0; x < x1; x++)
-                {
-                    var c = pixels[row + x];
-
-                    if (c.Alpha < 10)
-                    {  continue;}
-
-                    sumR += c.Red;
-                    sumG += c.Green;
-                    sumB += c.Blue;
-                    count++;
-                }
-            }
-        }
-
-        if (count is 0)
-        {
-            return false;
-        }
-
-        var avgColor = (
-            R: sumR / (double)count,
-            G: sumG / (double)count,
-            B: sumB / (double)count
-        );
-
-        foreach (var blacklistedColor in _options.Value.ColorsBlacklist)
-        {
-            if (blacklistedColor.IsSimilarTo(avgColor))
-                return true;
-        }
-
-        return false;
+        return _options.Value.ColorsBlacklist.Any(blacklistedColor => blacklistedColor.IsSimilarTo(color));
     }
 
     private bool IsBoundingRectangleSmallArea(PdfPath path)

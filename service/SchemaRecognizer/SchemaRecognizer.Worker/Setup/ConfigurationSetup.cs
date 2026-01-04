@@ -1,6 +1,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using SchemaRecognizer.Core.Configuration;
+using SchemaRecognizer.Core.Configuration.Configure;
 
 namespace SchemaRecognizer.Worker.Setup;
 
@@ -18,7 +20,8 @@ internal static class ConfigurationSetup
         AddAppOptions(services, configuration);
 
         return services
-            .AddSingleton<IConfiguration>(configuration);
+            .AddSingleton<IConfiguration>(configuration)
+            .AddSingleton<IConfigureOptions<PdfPathFilterOptions>, PdfPathFilterOptionsConfigure>();
     }
 
     private static void AddAppOptions(IServiceCollection services, IConfiguration configuration)

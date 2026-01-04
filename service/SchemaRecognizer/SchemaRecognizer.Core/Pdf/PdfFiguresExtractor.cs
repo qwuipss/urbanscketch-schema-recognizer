@@ -29,23 +29,14 @@ public sealed partial class PdfFiguresExtractor(
         var filterVerdictStatistics = GetFilterVerdictStatistics();
         var figures = new List<Figure>();
 
-        var rasterPdfFilePath = _options.Value.RasterPdfFilePath;
-        using var bitmap = SKBitmap.Decode(rasterPdfFilePath);
-
         foreach (var path in page.Paths)
         {
-            var filterVerdict = _pdfPathFilter.GetFilterVerdict(path, bitmap);
+            var filterVerdict = _pdfPathFilter.GetFilterVerdict(path);
 
             filterVerdictStatistics[filterVerdict]++;
 
             if (filterVerdict is not PdfPathFilterVerdict.None)
             {
-                continue;
-            }
-
-            if (path.IsStroked && path.StrokeColor is not null && path.StrokeColor.ToRGBValues().r > 200)
-            {
-                Console.WriteLine("");
                 continue;
             }
 

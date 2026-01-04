@@ -30,14 +30,6 @@ public sealed class Polygon(PdfSubpath subPath) : Figure
         }
 
         canvas.ClosePathFillStroke();
-
-        canvas.BeginText();
-        canvas.SetFontAndSize(PdfFontFactory.CreateFont(StandardFonts.HELVETICA), 5);
-
-        canvas.MoveText(_coordinates[0].X, _coordinates[0].Y);
-
-        canvas.ShowText("asd");
-        canvas.EndText();
     }
 
     public override object GetGeoJsonFeature(PdfFileInfo pdfFileInfo)

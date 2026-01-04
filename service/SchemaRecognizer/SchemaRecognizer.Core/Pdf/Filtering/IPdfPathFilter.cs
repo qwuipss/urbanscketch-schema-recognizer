@@ -5,5 +5,5 @@ namespace SchemaRecognizer.Core.Pdf.Filtering;
 
 public interface IPdfPathFilter
 {
-    PdfPathFilterVerdict GetFilterVerdict(PdfPath path, SKBitmap bitmap);
+    PdfPathFilterVerdict GetFilterVerdict(PdfPath path);
 }
