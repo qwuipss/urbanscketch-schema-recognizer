@@ -31,7 +31,7 @@ public sealed partial class PdfFiguresExtractor(
 
         foreach (var path in page.Paths)
         {
-            var filterVerdict = _pdfPathFilter.GetFilterVerdict(path);
+            var filterVerdict = _pdfPathFilter.GetFilterVerdict(path, pdfFileInfo);
 
             filterVerdictStatistics[filterVerdict]++;
 

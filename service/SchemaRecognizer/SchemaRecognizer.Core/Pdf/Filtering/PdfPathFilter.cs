@@ -10,7 +10,7 @@ public sealed class PdfPathFilter(IOptions<PdfPathFilterOptions> options) : IPdf
 {
     private readonly IOptions<PdfPathFilterOptions> _options = options;
 
-    public PdfPathFilterVerdict GetFilterVerdict(PdfPath path)
+    public PdfPathFilterVerdict GetFilterVerdict(PdfPath path, PdfFileInfo pdfFileInfo)
     {
         if (IsCommandsLimitExceeded(path))
         {
@@ -22,7 +22,7 @@ public sealed class PdfPathFilter(IOptions<PdfPathFilterOptions> options) : IPdf
             return PdfPathFilterVerdict.BoundingRectangleNotPresented;
         }
 
-        if (!IsInBoundingBox(path))
+        if (!IsInBoundingBox(path, pdfFileInfo))
         {
             return PdfPathFilterVerdict.OutOfBoundingBox;
         }
@@ -57,19 +57,26 @@ public sealed class PdfPathFilter(IOptions<PdfPathFilterOptions> options) : IPdf
         return boundingRectangle.HasValue;
     }
 
-    private bool IsInBoundingBox(PdfPath path)
+    private bool IsInBoundingBox(PdfPath path, PdfFileInfo pdfFileInfo)
     {
         var filterOptions = _options.Value;
+        var boundingBox = filterOptions.BoundingBox;
+        var boundingRectangle = path.GetBoundingRectangle();
 
-        if (filterOptions.BoundingBox is null)
+        if (boundingBox is null || boundingRectangle is null)
         {
             return true;
         }
 
-        var boundingRectangle = path.GetBoundingRectangle();
+        var pageHeight = pdfFileInfo.Height;
+        var invertedBoundingRectangle = new PdfRectangle(
+            boundingRectangle.Value.Left,
+            pageHeight - boundingRectangle.Value.Top - boundingRectangle.Value.Height,
+            boundingRectangle.Value.Right,
+            pageHeight - boundingRectangle.Value.Top
+        );
 
-        
-        return boundingRectangle is null || filterOptions.BoundingBox.Value.IntersectsWith(boundingRectangle.Value);
+        return invertedBoundingRectangle.IntersectsWith(boundingBox.Value);
     }
 
     private bool IsFillColorBlacklisted(PdfPath path)
