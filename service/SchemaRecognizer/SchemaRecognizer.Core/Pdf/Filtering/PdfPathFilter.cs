@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Options;
 using SchemaRecognizer.Core.Configuration;
-using SchemaRecognizer.Core.Extensions;
+using UglyToad.PdfPig.Core;
+using UglyToad.PdfPig.Geometry;
 using UglyToad.PdfPig.Graphics;
 
 namespace SchemaRecognizer.Core.Pdf.Filtering;
@@ -9,7 +10,7 @@ public sealed class PdfPathFilter(IOptions<PdfPathFilterOptions> options) : IPdf
 {
     private readonly IOptions<PdfPathFilterOptions> _options = options;
 
-    public PdfPathFilterVerdict GetFilterVerdict(PdfPath path)
+    public PdfPathFilterVerdict GetFilterVerdict(PdfPath path, PdfFileInfo pdfFileInfo)
     {
         if (IsCommandsLimitExceeded(path))
         {
@@ -19,6 +20,11 @@ public sealed class PdfPathFilter(IOptions<PdfPathFilterOptions> options) : IPdf
         if (!IsBoundingRectanglePresent(path))
         {
             return PdfPathFilterVerdict.BoundingRectangleNotPresented;
+        }
+
+        if (!IsInBoundingBox(path, pdfFileInfo))
+        {
+            return PdfPathFilterVerdict.OutOfBoundingBox;
         }
 
         if (IsBoundingRectangleSmallArea(path))
@@ -51,6 +57,28 @@ public sealed class PdfPathFilter(IOptions<PdfPathFilterOptions> options) : IPdf
         return boundingRectangle.HasValue;
     }
 
+    private bool IsInBoundingBox(PdfPath path, PdfFileInfo pdfFileInfo)
+    {
+        var filterOptions = _options.Value;
+        var boundingBox = filterOptions.BoundingBox;
+        var boundingRectangle = path.GetBoundingRectangle();
+
+        if (boundingBox is null || boundingRectangle is null)
+        {
+            return true;
+        }
+
+        var pageHeight = pdfFileInfo.Height;
+        var invertedBoundingRectangle = new PdfRectangle(
+            boundingRectangle.Value.Left,
+            pageHeight - boundingRectangle.Value.Top - boundingRectangle.Value.Height,
+            boundingRectangle.Value.Right,
+            pageHeight - boundingRectangle.Value.Top
+        );
+
+        return invertedBoundingRectangle.IntersectsWith(boundingBox.Value);
+    }
+
     private bool IsFillColorBlacklisted(PdfPath path)
     {
         if (!path.IsFilled || path.FillColor is null)
@@ -58,10 +86,9 @@ public sealed class PdfPathFilter(IOptions<PdfPathFilterOptions> options) : IPdf
             return false;
         }
 
-        var color = path.FillColor.ToRGBValues().ToHexColorString();
-        var blacklistedColors = _options.Value.ColorsBlacklist;
+        var color = path.FillColor.ToRGBValues();
 
-        return blacklistedColors.Contains(color, StringComparer.OrdinalIgnoreCase);
+        return _options.Value.ColorsBlacklist.Any(blacklistedColor => blacklistedColor.IsSimilarTo(color));
     }
 
     private bool IsBoundingRectangleSmallArea(PdfPath path)

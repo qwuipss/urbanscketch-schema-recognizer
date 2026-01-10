@@ -1,4 +1,4 @@
-using UglyToad.PdfPig;
+using PdfDocument = UglyToad.PdfPig.PdfDocument;
 
 namespace SchemaRecognizer.Core.Pdf.Utilities;
 

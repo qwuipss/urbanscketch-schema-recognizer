@@ -6,6 +6,7 @@ using SchemaRecognizer.Core.Configuration;
 using SchemaRecognizer.Core.Figures;
 using SchemaRecognizer.Core.Helpers;
 using Path = System.IO.Path;
+using PdfDocument = iText.Kernel.Pdf.PdfDocument;
 
 namespace SchemaRecognizer.Core.Pdf.Drawing;
 

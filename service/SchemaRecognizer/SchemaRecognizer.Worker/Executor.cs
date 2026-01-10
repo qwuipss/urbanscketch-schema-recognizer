@@ -1,8 +1,8 @@
-using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using SchemaRecognizer.Core.Geo;
 using SchemaRecognizer.Core.Pdf;
 using SchemaRecognizer.Core.Pdf.Drawing;
+using SchemaRecognizer.Core.Pdf.Rasterization;
 using SchemaRecognizer.Core.Pdf.Utilities;
 
 namespace SchemaRecognizer.Worker;
@@ -13,7 +13,8 @@ internal sealed partial class Executor(
     IPdfTypeDetector pdfTypeDetector,
     IPdfFiguresExtractor pdfFiguresExtractor,
     IPdfDrawer pdfDrawer,
-    IGeoJsonSerializer geoJsonSerializer
+    IGeoJsonSerializer geoJsonSerializer,
+    IPdfRasterizer pdfRasterizer
 ) : IExecutor
 {
     private readonly ILogger<Executor> _logger = logger;
@@ -22,6 +23,7 @@ internal sealed partial class Executor(
     private readonly IPdfTypeDetector _pdfTypeDetector = pdfTypeDetector;
     private readonly IPdfValidator _pdfValidator = pdfValidator;
     private readonly IGeoJsonSerializer _geoJsonSerializer = geoJsonSerializer;
+    private readonly IPdfRasterizer _pdfRasterizer = pdfRasterizer;
 
     public void Run(FileInfo fileInfo)
     {
@@ -38,6 +40,9 @@ internal sealed partial class Executor(
             throw new NotSupportedException(); // temp
         }
 
+        _pdfRasterizer.Rasterize(pdfFileInfo);
+        LogPdfRasterizationFinished();
+
         var figures = _pdfFiguresExtractor.Extract(pdfFileInfo);
         LogFiguresExtractingFinished(figures.Count);
 
@@ -46,6 +51,9 @@ internal sealed partial class Executor(
 
         _geoJsonSerializer.Serialize(figures, pdfFileInfo);
         LogFiguresSerializingFinished();
+
+        _pdfValidator.ValidatePdfRasterization(pdfFileInfo);
+        LogPdfRasterizationValidated();
     }
 
     [LoggerMessage(LogLevel.Information, "Executor started")]
@@ -65,4 +73,10 @@ internal sealed partial class Executor(
 
     [LoggerMessage(LogLevel.Information, "Figures serializing finished")]
     partial void LogFiguresSerializingFinished();
+
+    [LoggerMessage(LogLevel.Information, "Pdf rasterization finished")]
+    partial void LogPdfRasterizationFinished();
+
+    [LoggerMessage(LogLevel.Information, "Pdf rasterization validated")]
+    partial void LogPdfRasterizationValidated();
 }

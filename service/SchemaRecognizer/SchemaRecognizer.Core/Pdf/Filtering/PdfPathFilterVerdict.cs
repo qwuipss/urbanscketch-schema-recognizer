@@ -9,4 +9,5 @@ public enum PdfPathFilterVerdict
     BoundingRectangleSmallWidth,
     BoundingRectangleSmallHeight,
     ColorBlacklisted,
+    OutOfBoundingBox,
 }

@@ -1,3 +1,5 @@
+using iText.IO.Font.Constants;
+using iText.Kernel.Font;
 using iText.Kernel.Pdf.Canvas;
 using SchemaRecognizer.Core.Pdf;
 using UglyToad.PdfPig.Core;
@@ -30,7 +32,7 @@ public sealed class Polygon(PdfSubpath subPath) : Figure
         canvas.ClosePathFillStroke();
     }
 
-    public override object ToGeoJsonFeature(PdfFileInfo pdfFileInfo)
+    public override object GetGeoJsonFeature(PdfFileInfo pdfFileInfo)
     {
         var featureCoordinates = new List<double[]>();
 
@@ -43,13 +45,13 @@ public sealed class Polygon(PdfSubpath subPath) : Figure
                 / MillimetersInMeter;
 
             var yMeters =
-                (pdfFileInfo.Height - coordinate.Y)
+                coordinate.Y
                 / PdfMmToPtFactor
                 * pdfFileInfo.Scale
                 / MillimetersInMeter;
 
-            var longitude = xMeters / EarthRadius * RadiansToDegreesFactor;
-            var latitude = yMeters / EarthRadius * RadiansToDegreesFactor;
+            var longitude = xMeters / EarthRadiusMeters * RadiansToDegreesFactor;
+            var latitude = yMeters / EarthRadiusMeters * RadiansToDegreesFactor;
 
             featureCoordinates.Add([longitude, latitude,]);
         }

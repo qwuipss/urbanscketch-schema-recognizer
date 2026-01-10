@@ -20,7 +20,7 @@ public sealed class GeoJsonSerializer(IOptions<PdfSchemaOptions> options) : IGeo
     public void Serialize(IEnumerable<Figure> figures, PdfFileInfo pdfFileInfo)
     {
         var fileInfo = FilesHelper.GetFileInfoByPath(_options.Value.WriteFiguresGeoJsonFilePath);
-        var features = figures.Select(figure => figure.ToGeoJsonFeature(pdfFileInfo)).ToList();
+        var features = figures.Select(figure => figure.GetGeoJsonFeature(pdfFileInfo)).ToList();
 
         var geoJsonObject = new
         {
@@ -29,6 +29,7 @@ public sealed class GeoJsonSerializer(IOptions<PdfSchemaOptions> options) : IGeo
         };
 
         using var stream = fileInfo.Open(FileMode.CreateNew, FileAccess.Write);
+
         JsonSerializer.Serialize(
             stream,
             geoJsonObject,

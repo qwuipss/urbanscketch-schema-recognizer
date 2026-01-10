@@ -1,17 +1,26 @@
 using System.Text;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using SchemaRecognizer.Core.Configuration;
 using SchemaRecognizer.Core.Extensions;
 using SchemaRecognizer.Core.Figures;
 using SchemaRecognizer.Core.Pdf.Filtering;
+using SkiaSharp;
 using UglyToad.PdfPig;
+using PdfDocument = UglyToad.PdfPig.PdfDocument;
 
 namespace SchemaRecognizer.Core.Pdf;
 
-public sealed partial class PdfFiguresExtractor(ILogger<PdfFiguresExtractor> logger, IPdfPathFilter pdfPathFilter)
+public sealed partial class PdfFiguresExtractor(
+    ILogger<PdfFiguresExtractor> logger,
+    IPdfPathFilter pdfPathFilter,
+    IOptions<PdfSchemaOptions> options
+)
     : IPdfFiguresExtractor
 {
     private readonly ILogger<PdfFiguresExtractor> _logger = logger;
     private readonly IPdfPathFilter _pdfPathFilter = pdfPathFilter;
+    private readonly IOptions<PdfSchemaOptions> _options = options;
 
     public ICollection<Figure> Extract(PdfFileInfo pdfFileInfo)
     {
@@ -22,7 +31,7 @@ public sealed partial class PdfFiguresExtractor(ILogger<PdfFiguresExtractor> log
 
         foreach (var path in page.Paths)
         {
-            var filterVerdict = _pdfPathFilter.GetFilterVerdict(path);
+            var filterVerdict = _pdfPathFilter.GetFilterVerdict(path, pdfFileInfo);
 
             filterVerdictStatistics[filterVerdict]++;
 
