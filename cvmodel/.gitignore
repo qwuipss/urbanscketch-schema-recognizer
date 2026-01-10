@@ -7,3 +7,4 @@ output_data.json
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+runs/
