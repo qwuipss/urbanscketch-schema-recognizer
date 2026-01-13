@@ -9,4 +9,6 @@ public sealed class PdfSchemaOptions
     public string WriteFiguresGeoJsonFilePath { get; set; } = "./../../../../pdf/dev/schema.geojson";
     
     public string RasterPdfFilePath { get; set; } = "./../../../../pdf/dev/raster.jpeg";
+
+    public string DbConnectionString { get; set; } = "Host=localhost;Port=5432;Database=gis;Username=gisuser;Password=gispass;";
 }

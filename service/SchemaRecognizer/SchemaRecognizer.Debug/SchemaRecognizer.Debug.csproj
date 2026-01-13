@@ -5,11 +5,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="IronPdf" />
-        <PackageReference Include="IronPdf.Native.Chrome.Linux" />
-    </ItemGroup>
-
-    <ItemGroup>
         <ProjectReference Include="..\SchemaRecognizer.Core\SchemaRecognizer.Core.csproj"/>
     </ItemGroup>
 

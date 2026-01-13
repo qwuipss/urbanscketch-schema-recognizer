@@ -1,6 +1,7 @@
 using iText.IO.Font.Constants;
 using iText.Kernel.Font;
 using iText.Kernel.Pdf.Canvas;
+using SchemaRecognizer.Core.Helpers;
 using SchemaRecognizer.Core.Pdf;
 using UglyToad.PdfPig.Core;
 using static SchemaRecognizer.Core.Pdf.Constants;
@@ -34,8 +35,11 @@ public sealed class Polygon(PdfSubpath subPath) : Figure
 
     public override object GetGeoJsonFeature(PdfFileInfo pdfFileInfo)
     {
+        const double epsilon = 10e-9;
+
         var featureCoordinates = new List<double[]>();
 
+        // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
         foreach (var coordinate in _coordinates)
         {
             var xMeters =
@@ -54,6 +58,17 @@ public sealed class Polygon(PdfSubpath subPath) : Figure
             var latitude = yMeters / EarthRadiusMeters * RadiansToDegreesFactor;
 
             featureCoordinates.Add([longitude, latitude,]);
+        }
+
+        // ReSharper disable once InvertIf
+        if (featureCoordinates.Count is not 0)
+        {
+            var first = featureCoordinates[0];
+            var last = featureCoordinates[^1];
+            if (!MathHelper.AreEqual(first[0], last[0], epsilon) || !MathHelper.AreEqual(first[1], last[1], epsilon))
+            {
+                featureCoordinates.Add([first[0], first[1]]);
+            }
         }
 
         return new
