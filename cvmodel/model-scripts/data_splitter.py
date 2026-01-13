@@ -16,10 +16,10 @@ CLASS_ID = 0  # contour
 random.seed(42)
 
 for p in [
-    OUTPUT_DIR / "images/train",
-    OUTPUT_DIR / "images/val",
-    OUTPUT_DIR / "labels/train",
-    OUTPUT_DIR / "labels/val",
+    OUTPUT_DIR / "/images/train",
+    OUTPUT_DIR / "/images/val",
+    OUTPUT_DIR / "/labels/train",
+    OUTPUT_DIR / "/labels/val",
 ]:
     p.mkdir(parents=True, exist_ok=True)
 
