@@ -10,12 +10,13 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
-
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY server /app/server
+COPY cvmodel /app/cvmodel
+COPY models /app/models
 
 EXPOSE 5000
 
-CMD ["python", "server.py"]
+CMD ["python", "server/app.py"]
