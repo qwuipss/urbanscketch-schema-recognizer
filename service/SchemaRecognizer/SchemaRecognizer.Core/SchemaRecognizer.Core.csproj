@@ -9,7 +9,10 @@
         <PackageReference Include="IronPdf.Native.Chrome.Linux" />
         <PackageReference Include="itext"/>
         <PackageReference Include="itext.bouncy-castle-adapter"/>
+        <PackageReference Include="NetTopologySuite" />
+        <PackageReference Include="NetTopologySuite.IO.GeoJSON" />
         <PackageReference Include="Newtonsoft.Json"/>
+        <PackageReference Include="Npgsql" />
         <PackageReference Include="PdfPig"/>
         <PackageReference Include="Serilog"/>
         <PackageReference Include="Serilog.Extensions.Logging"/>

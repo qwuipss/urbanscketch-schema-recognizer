@@ -12,7 +12,7 @@ public sealed class GeoJsonSerializer(IOptions<PdfSchemaOptions> options) : IGeo
     private static readonly JsonSerializerOptions GeoJsonSerializerOptions =
         new()
         {
-            WriteIndented = true
+            WriteIndented = true,
         };
 
     private readonly IOptions<PdfSchemaOptions> _options = options;

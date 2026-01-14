@@ -19,6 +19,7 @@ internal static class ServicesSetup
                .AddSingleton<IPdfFiguresExtractor, PdfFiguresExtractor>()
                .AddSingleton<IPdfDrawer, PdfDrawer>()
                .AddSingleton<IGeoJsonSerializer, GeoJsonSerializer>()
+               .AddSingleton<IGeoJsonExporter, GeoJsonExporter>()
                .AddSingleton<IPdfRasterizer, PdfRasterizer>()
                .AddSingleton<IExecutor, Executor>();
     }

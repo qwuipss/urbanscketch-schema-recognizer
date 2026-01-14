@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using SchemaRecognizer.Core.Geo;
 using SchemaRecognizer.Core.Pdf;
@@ -14,7 +15,8 @@ internal sealed partial class Executor(
     IPdfFiguresExtractor pdfFiguresExtractor,
     IPdfDrawer pdfDrawer,
     IGeoJsonSerializer geoJsonSerializer,
-    IPdfRasterizer pdfRasterizer
+    IPdfRasterizer pdfRasterizer,
+    IGeoJsonExporter geoJsonExporter
 ) : IExecutor
 {
     private readonly ILogger<Executor> _logger = logger;
@@ -24,59 +26,94 @@ internal sealed partial class Executor(
     private readonly IPdfValidator _pdfValidator = pdfValidator;
     private readonly IGeoJsonSerializer _geoJsonSerializer = geoJsonSerializer;
     private readonly IPdfRasterizer _pdfRasterizer = pdfRasterizer;
+    private readonly IGeoJsonExporter _geoJsonExporter = geoJsonExporter;
 
     public void Run(FileInfo fileInfo)
     {
+        var swTotal = Stopwatch.StartNew();
         LogWorkerStarted();
 
+        var sw = Stopwatch.StartNew();
         var pdfFileInfo = _pdfValidator.Validate(fileInfo);
-        LogPdfValidated();
+        sw.Stop();
+        LogPdfValidated(GetElapsedMs(sw));
 
+        sw.Restart();
         var pdfType = _pdfTypeDetector.Detect(fileInfo);
-        LogDetectedPdfType(pdfType);
+        sw.Stop();
+        LogDetectedPdfType(pdfType, GetElapsedMs(sw));
 
         if (pdfType is PdfType.Raster)
         {
+            sw.Restart();
+            _pdfRasterizer.Rasterize(pdfFileInfo);
+            sw.Stop();
+            LogPdfRasterizationFinished(GetElapsedMs(sw));
+
+            sw.Restart();
+            _pdfValidator.ValidatePdfRasterization(pdfFileInfo);
+            sw.Stop();
+            LogPdfRasterizationValidated(GetElapsedMs(sw));
+
             throw new NotSupportedException(); // temp
         }
 
-        _pdfRasterizer.Rasterize(pdfFileInfo);
-        LogPdfRasterizationFinished();
-
+        sw.Restart();
         var figures = _pdfFiguresExtractor.Extract(pdfFileInfo);
-        LogFiguresExtractingFinished(figures.Count);
+        sw.Stop();
+        LogFiguresExtractingFinished(figures.Count, GetElapsedMs(sw));
 
+        sw.Restart();
         _pdfDrawer.Draw(figures, pdfFileInfo);
-        LogFiguresDrawingFinished();
+        sw.Stop();
+        LogFiguresDrawingFinished(GetElapsedMs(sw));
 
+        sw.Restart();
         _geoJsonSerializer.Serialize(figures, pdfFileInfo);
-        LogFiguresSerializingFinished();
+        sw.Stop();
+        LogFiguresSerializingFinished(GetElapsedMs(sw));
 
-        _pdfValidator.ValidatePdfRasterization(pdfFileInfo);
-        LogPdfRasterizationValidated();
+        sw.Restart();
+        _geoJsonExporter.Export();
+        sw.Stop();
+        LogGeoJsonExportedToDatabase(GetElapsedMs(sw));
+
+        swTotal.Stop();
+        LogWorkerFinished(swTotal.ElapsedMilliseconds);
     }
+
+    private static long GetElapsedMs(Stopwatch stopwatch) => stopwatch.ElapsedMilliseconds;
 
     [LoggerMessage(LogLevel.Information, "Executor started")]
     partial void LogWorkerStarted();
 
-    [LoggerMessage(LogLevel.Information, "Pdf validated")]
-    partial void LogPdfValidated();
+    [LoggerMessage(LogLevel.Information, "Pdf validated in {ElapsedMs}ms")]
+    partial void LogPdfValidated(long elapsedMs);
 
-    [LoggerMessage(LogLevel.Information, "Detected pdf type: {PdfType}")]
-    partial void LogDetectedPdfType(PdfType pdfType);
+    [LoggerMessage(LogLevel.Information, "Detected pdf type: {PdfType}. Detected in {ElapsedMs}ms")]
+    partial void LogDetectedPdfType(PdfType pdfType, long elapsedMs);
 
-    [LoggerMessage(LogLevel.Information, "Figures extracting finished. Extracted figures: {ExtractedFiguresCount}")]
-    partial void LogFiguresExtractingFinished(int extractedFiguresCount);
+    [LoggerMessage(
+        LogLevel.Information,
+        "Figures extracting finished in {ElapsedMs}ms. Extracted figures: {ExtractedFiguresCount}"
+    )]
+    partial void LogFiguresExtractingFinished(int extractedFiguresCount, long elapsedMs);
 
-    [LoggerMessage(LogLevel.Information, "Figures drawing finished")]
-    partial void LogFiguresDrawingFinished();
+    [LoggerMessage(LogLevel.Information, "Figures drawing finished in {ElapsedMs}ms")]
+    partial void LogFiguresDrawingFinished(long elapsedMs);
 
-    [LoggerMessage(LogLevel.Information, "Figures serializing finished")]
-    partial void LogFiguresSerializingFinished();
+    [LoggerMessage(LogLevel.Information, "Figures serializing finished in {ElapsedMs}ms")]
+    partial void LogFiguresSerializingFinished(long elapsedMs);
 
-    [LoggerMessage(LogLevel.Information, "Pdf rasterization finished")]
-    partial void LogPdfRasterizationFinished();
+    [LoggerMessage(LogLevel.Information, "Pdf rasterization finished in {ElapsedMs}ms")]
+    partial void LogPdfRasterizationFinished(long elapsedMs);
 
-    [LoggerMessage(LogLevel.Information, "Pdf rasterization validated")]
-    partial void LogPdfRasterizationValidated();
+    [LoggerMessage(LogLevel.Information, "Pdf rasterization validated in {ElapsedMs}ms")]
+    partial void LogPdfRasterizationValidated(long elapsedMs);
+
+    [LoggerMessage(LogLevel.Information, "GeoJson exported to database in {ElapsedMs}ms")]
+    partial void LogGeoJsonExportedToDatabase(long elapsedMs);
+
+    [LoggerMessage(LogLevel.Information, "Executor finished in {ElapsedMs}ms")]
+    partial void LogWorkerFinished(long elapsedMs);
 }
