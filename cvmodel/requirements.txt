@@ -1,33 +1,17 @@
-#---------------------------------
-# pip install -r requirements.txt
-#---------------------------------
-
-# YOLOv8
+# Core
 ultralytics>=8.0.0
-
 numpy>=1.24.0
+
+# Torch (CPU)
 torch>=2.0.0
-# tensor operations
 torchvision>=0.15.0
 
-# img load
+# Images
 Pillow>=9.5.0
+opencv-python-headless>=4.7.0
 
-# img reading (OpenCV bindings)
-opencv-python>=4.7.0
-
-# Graph visualizing
-matplotlib>=3.7.0
-
-# Work with PostgreSQL
-# Replace with mysqlclient / cx_oracle / sqlite
-psycopg2-binary>=2.9.6
-
-# tables
-pandas>=2.0.0
-
-# args parcing
-argparse>=1.4.0
-
-# logs
+# Utils
 tqdm>=4.65.0
+
+# Web
+flask>=2.3.0
