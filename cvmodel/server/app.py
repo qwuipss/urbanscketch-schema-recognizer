@@ -6,7 +6,7 @@ from io import BytesIO
 
 app = Flask(__name__)
 
-MODEL_PATH = "cvmodel/models/best.pt"
+MODEL_PATH = "models/best.pt"
 TILE_SIZE = 640
 
 model = YOLO(MODEL_PATH)
