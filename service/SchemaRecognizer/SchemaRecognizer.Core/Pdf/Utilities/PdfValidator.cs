@@ -38,7 +38,7 @@ public class PdfValidator(IOptions<PdfSchemaOptions> options) : IPdfValidator
 
     public void ValidatePdfRasterization(PdfFileInfo fileInfo)
     {
-        var rasterPdfFilePath = _options.Value.RasterPdfFilePath;
+        var rasterPdfFilePath = _options.Value.RasterizedPdfRecognizedFilePath;
         using var bitmap = SKBitmap.Decode(rasterPdfFilePath);
 
         if (bitmap is null)

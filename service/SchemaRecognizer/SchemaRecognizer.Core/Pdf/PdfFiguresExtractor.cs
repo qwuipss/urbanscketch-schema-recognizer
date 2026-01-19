@@ -7,6 +7,8 @@ using SchemaRecognizer.Core.Figures;
 using SchemaRecognizer.Core.Pdf.Filtering;
 using SkiaSharp;
 using UglyToad.PdfPig;
+using UglyToad.PdfPig.Core;
+using UglyToad.PdfPig.Graphics;
 using PdfDocument = UglyToad.PdfPig.PdfDocument;
 
 namespace SchemaRecognizer.Core.Pdf;
@@ -40,6 +42,11 @@ public sealed partial class PdfFiguresExtractor(
                 continue;
             }
 
+            if (IsRedLine(path))
+            {
+                continue;
+            }
+
             foreach (var subPath in path)
             {
                 if (subPath.IsClosed() && subPath.HasClose() && !subPath.HasBezierCurve())
@@ -53,6 +60,26 @@ public sealed partial class PdfFiguresExtractor(
         LogFilterVerdictStatistics(filterVerdictStatistics);
 
         return figures;
+    }
+
+    private bool IsRedLine(PdfPath path)
+    {
+        if (path is not { IsFilled: true, FillColor: not null })
+        {
+            return false;
+        }
+
+        if (path.Any(subPath => !subPath.IsClosed() || !subPath.HasClose()))
+        {
+            return false;
+        }
+
+        var redLineThreshold = _options.Value.RedLineThreshold;
+        var fillColor = path.FillColor.ToRGBValues();
+
+        return fillColor.r * byte.MaxValue > redLineThreshold.R
+               && fillColor.g * byte.MaxValue < redLineThreshold.G
+               && fillColor.b * byte.MaxValue < redLineThreshold.B;
     }
 
     private void LogFilterVerdictStatistics(Dictionary<PdfPathFilterVerdict, int> filterVerdictStatistics)

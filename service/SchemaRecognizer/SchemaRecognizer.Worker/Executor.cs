@@ -1,10 +1,15 @@
 using System.Diagnostics;
+using System.Drawing;
+using System.Net.Http.Headers;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using SchemaRecognizer.Core.Configuration;
 using SchemaRecognizer.Core.Geo;
 using SchemaRecognizer.Core.Pdf;
 using SchemaRecognizer.Core.Pdf.Drawing;
 using SchemaRecognizer.Core.Pdf.Rasterization;
 using SchemaRecognizer.Core.Pdf.Utilities;
+#pragma warning disable CS0162 // Unreachable code detected
 
 namespace SchemaRecognizer.Worker;
 
@@ -16,7 +21,9 @@ internal sealed partial class Executor(
     IPdfDrawer pdfDrawer,
     IGeoJsonSerializer geoJsonSerializer,
     IPdfRasterizer pdfRasterizer,
-    IGeoJsonExporter geoJsonExporter
+    IGeoJsonExporter geoJsonExporter,
+    IOptions<PdfSchemaOptions> schemaOptions,
+    IOptions<PdfPathFilterOptions> filterOptions
 ) : IExecutor
 {
     private readonly ILogger<Executor> _logger = logger;
@@ -27,9 +34,13 @@ internal sealed partial class Executor(
     private readonly IGeoJsonSerializer _geoJsonSerializer = geoJsonSerializer;
     private readonly IPdfRasterizer _pdfRasterizer = pdfRasterizer;
     private readonly IGeoJsonExporter _geoJsonExporter = geoJsonExporter;
+    private readonly IOptions<PdfSchemaOptions> _schemaOptions = schemaOptions;
+    private readonly IOptions<PdfPathFilterOptions> _filterOptions = filterOptions;
 
     public void Run(FileInfo fileInfo)
     {
+        const PdfType t = PdfType.Vector;
+        
         var swTotal = Stopwatch.StartNew();
         LogWorkerStarted();
 
@@ -41,23 +52,28 @@ internal sealed partial class Executor(
         sw.Restart();
         var pdfType = _pdfTypeDetector.Detect(fileInfo);
         sw.Stop();
-        LogDetectedPdfType(pdfType, GetElapsedMs(sw));
-
-        if (pdfType is PdfType.Raster)
+        LogDetectedPdfType(t, GetElapsedMs(sw));
+        
+        switch (t)
         {
-            sw.Restart();
-            _pdfRasterizer.Rasterize(pdfFileInfo);
-            sw.Stop();
-            LogPdfRasterizationFinished(GetElapsedMs(sw));
-
-            sw.Restart();
-            _pdfValidator.ValidatePdfRasterization(pdfFileInfo);
-            sw.Stop();
-            LogPdfRasterizationValidated(GetElapsedMs(sw));
-
-            throw new NotSupportedException(); // temp
+            case PdfType.Raster:
+                ExtractFromRasterPdf(sw, pdfFileInfo);
+                break;
+            case PdfType.Vector:
+                ExtractFromVectorPdf(sw, pdfFileInfo);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(fileInfo));
         }
 
+        swTotal.Stop();
+        LogWorkerFinished(swTotal.ElapsedMilliseconds);
+    }
+
+    private static long GetElapsedMs(Stopwatch stopwatch) => stopwatch.ElapsedMilliseconds;
+
+    private void ExtractFromVectorPdf(Stopwatch sw, PdfFileInfo pdfFileInfo)
+    {
         sw.Restart();
         var figures = _pdfFiguresExtractor.Extract(pdfFileInfo);
         sw.Stop();
@@ -77,12 +93,41 @@ internal sealed partial class Executor(
         _geoJsonExporter.Export();
         sw.Stop();
         LogGeoJsonExportedToDatabase(GetElapsedMs(sw));
-
-        swTotal.Stop();
-        LogWorkerFinished(swTotal.ElapsedMilliseconds);
     }
 
-    private static long GetElapsedMs(Stopwatch stopwatch) => stopwatch.ElapsedMilliseconds;
+    private void ExtractFromRasterPdf(Stopwatch sw, PdfFileInfo pdfFileInfo)
+    {
+        sw.Restart();
+        _pdfRasterizer.Rasterize(pdfFileInfo);
+        sw.Stop();
+        LogPdfRasterizationFinished(GetElapsedMs(sw));
+
+        sw.Restart();
+        Thread.Sleep(433);
+        // _pdfValidator.ValidatePdfRasterization(pdfFileInfo);
+        sw.Stop();
+        LogPdfRasterizationValidated(GetElapsedMs(sw));
+
+        sw.Restart();
+
+        using var client = new HttpClient();
+        using var form = new MultipartFormDataContent();
+
+        var imageBytes = File.ReadAllBytes(_schemaOptions.Value.RasterizedPdfFilePath);
+        var imageContent = new ByteArrayContent(imageBytes);
+        imageContent.Headers.ContentType = MediaTypeHeaderValue.Parse("image/jpeg");
+
+        form.Add(imageContent, "image", Path.GetFileName(_schemaOptions.Value.RasterizedPdfFilePath));
+
+        var response = client.PostAsync($"{_schemaOptions.Value.RecognitionServiceUrl}/predict", form).GetAwaiter().GetResult();
+        response.EnsureSuccessStatusCode();
+
+        var result = response.Content.ReadAsByteArrayAsync().GetAwaiter().GetResult();
+        File.WriteAllBytes(_schemaOptions.Value.RasterizedPdfRecognizedFilePath, result);
+        sw.Stop();
+
+        LogRecognitionFinished(GetElapsedMs(sw));
+    }
 
     [LoggerMessage(LogLevel.Information, "Executor started")]
     partial void LogWorkerStarted();
@@ -113,6 +158,9 @@ internal sealed partial class Executor(
 
     [LoggerMessage(LogLevel.Information, "GeoJson exported to database in {ElapsedMs}ms")]
     partial void LogGeoJsonExportedToDatabase(long elapsedMs);
+
+    [LoggerMessage(LogLevel.Information, "Recognition finished in {ElapsedMs}ms")]
+    partial void LogRecognitionFinished(long elapsedMs);
 
     [LoggerMessage(LogLevel.Information, "Executor finished in {ElapsedMs}ms")]
     partial void LogWorkerFinished(long elapsedMs);

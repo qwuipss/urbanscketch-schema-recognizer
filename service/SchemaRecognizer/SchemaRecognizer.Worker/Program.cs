@@ -11,7 +11,7 @@ services
 
 var serviceProvider = services.BuildServiceProvider();
 
-var filePath = Path.Join(Environment.CurrentDirectory, "../../../../", "pdf/vector/v2.pdf");
+var filePath = Path.Join(Environment.CurrentDirectory, "../../../../", "pdf/v1.pdf");
 var fileInfo = new FileInfo(filePath);
 var worker = serviceProvider.GetRequiredService<IExecutor>();
 

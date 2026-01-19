@@ -12,7 +12,7 @@ public sealed class PdfRasterizer(IOptions<PdfSchemaOptions> options) : IPdfRast
     public void Rasterize(PdfFileInfo pdfFileInfo)
     {
         var pdfDocument = PdfDocument.FromFile(pdfFileInfo.FileInfo.FullName);
-        var rasterFileInfo = FilesHelper.GetFileInfoByPath(_options.Value.RasterPdfFilePath);
+        var rasterFileInfo = FilesHelper.GetFileInfoByPath(_options.Value.RasterizedPdfFilePath);
 
         pdfDocument.RasterizeToImageFiles(rasterFileInfo.FullName, ImageType.Default, Constants.PtToPxDpi);
     }

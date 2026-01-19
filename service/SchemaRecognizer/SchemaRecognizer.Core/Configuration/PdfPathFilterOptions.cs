@@ -14,6 +14,6 @@ public sealed class PdfPathFilterOptions
     public int SmallHeightThreshold { get; set; } = 10;
 
     public PdfRectangle? BoundingBox { get; set; }
-
+    
     public List<Color> ColorsBlacklist { get; set; } = [];
 }
